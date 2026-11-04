@@ -2,12 +2,23 @@ import { describe, expect, it } from 'vitest'
 import { getDeviceBadge, getUnknownDeviceIcon } from './deviceIcon'
 
 describe('deviceIcon utils', () => {
-  it('returns SolarXiao badge with sun emoji', () => {
+  it('returns SolarXiao badge with sun emoji and E22P label', () => {
     const badge = getDeviceBadge('solarxiao_e22p')
     expect(badge).toEqual({
       isSpicy: false,
       isSolarXiao: true,
       emoji: '☀️',
+      label: 'E22P',
+    })
+  })
+
+  it('returns SolarXiao badge with default E22P label for base solarxiao', () => {
+    const badge = getDeviceBadge('solarxiao')
+    expect(badge).toEqual({
+      isSpicy: false,
+      isSolarXiao: true,
+      emoji: '☀️',
+      label: 'E22P',
     })
   })
 

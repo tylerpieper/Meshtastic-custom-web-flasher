@@ -13,10 +13,23 @@ export function getDeviceBadge(target?: string | null): DeviceBadgeInfo | null {
   const normalized = target.toLowerCase()
 
   if (normalized.includes('solarxiao')) {
+    let label = ''
+    if (normalized.includes('m33')) {
+      label = 'M33'
+    }
+    else if (normalized.includes('e22p')) {
+      label = 'E22P'
+    }
+    else {
+      const match = normalized.match(/solarxiao_([^_]+)/)
+      label = match ? match[1].toUpperCase() : 'E22P'
+    }
+
     return {
       isSpicy: false,
       isSolarXiao: true,
       emoji: '☀️',
+      label,
     }
   }
 

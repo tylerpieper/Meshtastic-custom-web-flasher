@@ -83,9 +83,13 @@
       <!-- SolarXiao Badge Overlay -->
       <div
         v-else-if="badgeInfo?.isSolarXiao"
-        class="absolute bottom-0 right-0 z-10 flex items-center bg-amber-950/90 border border-amber-500/80 rounded-full px-1.5 sm:px-2 py-0.5 shadow-md backdrop-blur-sm pointer-events-none select-none"
+        class="absolute bottom-0 right-0 z-10 flex items-center gap-0.5 sm:gap-1 bg-amber-950/90 border border-amber-500/80 rounded-full px-1.5 sm:px-2 py-0.5 shadow-md backdrop-blur-sm pointer-events-none select-none"
       >
         <span class="text-sm sm:text-base leading-none">☀️</span>
+        <span
+          v-if="badgeInfo.label"
+          class="text-[9px] sm:text-[11px] font-extrabold text-amber-200 tracking-wider font-mono uppercase"
+        >{{ badgeInfo.label }}</span>
       </div>
     </div>
     <div

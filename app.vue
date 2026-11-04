@@ -95,9 +95,13 @@
                     <!-- SolarXiao Overlay in Step 1 -->
                     <div
                       v-else-if="selectedDeviceBadge?.isSolarXiao"
-                      class="absolute bottom-1 right-1 z-10 flex items-center bg-amber-950/90 border border-amber-500/80 rounded-full px-2.5 py-1 shadow-lg backdrop-blur-sm pointer-events-none select-none"
+                      class="absolute bottom-1 right-1 z-10 flex items-center gap-1 bg-amber-950/90 border border-amber-500/80 rounded-full px-2.5 py-1 shadow-lg backdrop-blur-sm pointer-events-none select-none"
                     >
-                      <span class="text-xl leading-none">☀️</span>
+                      <span class="text-lg leading-none">☀️</span>
+                      <span
+                        v-if="selectedDeviceBadge.label"
+                        class="text-xs font-extrabold text-amber-200 tracking-wider font-mono uppercase"
+                      >{{ selectedDeviceBadge.label }}</span>
                     </div>
                   </div>
                   <Device />
