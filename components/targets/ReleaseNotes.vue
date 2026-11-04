@@ -3,8 +3,8 @@
     v-show="releaseNotes && !firmwareStore.hasSeenReleaseNotes"
     class="mb-4"
   >
-    <h1 class="text-theme text-xl font-semibold mb-3">
-      {{ firmwareStore.selectedFirmware?.title }}
+    <h1 class="text-theme text-xl font-semibold mb-1">
+      {{ deviceStore.selectedTarget?.displayName || 'Device' }} — {{ firmwareStore.selectedFirmware?.title || '' }}
     </h1>
     <div
       v-if="releaseNotes"
@@ -25,26 +25,81 @@ import { marked } from 'marked'
 import DOMPurify from 'dompurify'
 
 import { useFirmwareStore } from '../../stores/firmwareStore'
+import { useDeviceStore } from '../../stores/deviceStore'
 
 const firmwareStore = useFirmwareStore()
+const deviceStore = useDeviceStore()
 
 const releaseNotes = ref<string | undefined>(undefined)
 
+// Ensure external links open in a new tab
+DOMPurify.addHook('afterSanitizeAttributes', (node) => {
+  if ('target' in node) {
+    node.setAttribute('target', '_blank')
+    node.setAttribute('rel', 'noopener noreferrer')
+  }
+})
+
 const renderReleaseNotes = async () => {
-  const notes = firmwareStore.selectedFirmware?.release_notes || ''
-  if (!notes || notes.trim().length < 1) {
+  const fw = firmwareStore.selectedFirmware
+  const device = deviceStore.selectedTarget
+
+  let markdownContent = ''
+
+  if (fw?.targets) {
+    const target = fw.targets.find(t => t.board === device?.platformioTarget || t.variantName === device?.platformioTarget) || fw.targets[0]
+    const lines: string[] = [
+      '### Selection Summary',
+      '',
+      `* **Board Variant:** **${device?.displayName || target.board}** (\`${target.board}\`)`,
+    ]
+
+    if (device?.customDescription) {
+      lines.push(`> ${device.customDescription}`)
+      lines.push('')
+    }
+    if (device?.customRepoUrl) {
+      lines.push(`* **Hardware Repository:** [${device.customRepoUrl}](${device.customRepoUrl})`)
+    }
+
+    lines.push('')
+    lines.push(`* **Firmware Flavor:** **${fw.shortProfile || fw.profile}** (\`v${fw.version}\`)`)
+    if (fw.summary) {
+      lines.push(`> ${fw.summary}`)
+      lines.push('')
+    }
+    if (fw.description && fw.description !== fw.summary) {
+      lines.push(fw.description)
+      lines.push('')
+    }
+
+    lines.push('* **Repository Links:**')
+    if (fw.readmeUrl) {
+      lines.push(`  * [View Flavor Documentation & Notes](${fw.readmeUrl})`)
+    }
+    if (target?.boardFolderUrl || fw.folderUrl) {
+      lines.push(`  * [View Compiled Binaries & Manifest in Repo](${target?.boardFolderUrl || fw.folderUrl})`)
+    }
+
+    lines.push('')
+    lines.push('---')
+    lines.push('')
+    lines.push(`### Upstream Meshtastic v${fw.version} Release Notes`)
+    lines.push('')
+    lines.push(fw.upstreamNotes || '_No upstream release notes available._')
+
+    markdownContent = lines.join('\n')
+  }
+  else {
+    markdownContent = fw?.release_notes || ''
+  }
+
+  if (!markdownContent || markdownContent.trim().length < 1) {
     releaseNotes.value = undefined
     return
   }
 
-  // Release notes can contain untrusted content (e.g. PR titles for PR builds),
-  // so sanitize the rendered HTML before it reaches v-html. The trusted
-  // hardcoded markup below (alert icons) is applied after sanitization.
-  //
-  // Markdown block structure (paragraphs, headings, lists, blockquotes) is left
-  // intact and styled with the scoped CSS below — only real `> ...` blockquotes
-  // in the source render with the accent bar.
-  const output = DOMPurify.sanitize(await marked(notes))
+  const output = DOMPurify.sanitize(await marked(markdownContent))
   releaseNotes.value = output
     .replaceAll('[!CAUTION]', '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" /></svg>')
     .replaceAll('[!IMPORTANT]', '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" /></svg>')
@@ -52,9 +107,9 @@ const renderReleaseNotes = async () => {
     .replaceAll('[!NOTE]', '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg>')
 }
 
-// Re-render whenever the selected firmware or its release_notes change
+// Re-render whenever the selected firmware, upstreamNotes, or target changes
 watch(
-  () => firmwareStore.selectedFirmware?.release_notes,
+  [() => firmwareStore.selectedFirmware?.id, () => firmwareStore.selectedFirmware?.upstreamNotes, () => deviceStore.selectedTarget?.platformioTarget],
   () => { renderReleaseNotes() },
   { immediate: true },
 )

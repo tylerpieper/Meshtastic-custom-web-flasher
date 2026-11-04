@@ -21,6 +21,26 @@ export interface PrBuildInfo {
   targets: ReleaseTarget[]
 }
 
+export interface CustomTarget {
+  board: string
+  variantName: string
+  platform: string
+  basePath: string
+  boardFolderUrl?: string
+  mtJson?: string
+}
+
+export interface CustomWebFlasherManifest {
+  generatedAt: string
+  repo: string
+  branch: string
+  devices: DeviceHardware[]
+  releases: {
+    alpha: FirmwareResource[]
+    stable: FirmwareResource[]
+  }
+}
+
 export interface FirmwareResource {
   id: string
   title: string
@@ -28,6 +48,16 @@ export interface FirmwareResource {
   zip_url?: string
   release_notes?: string
   prBuild?: PrBuildInfo
+  version?: string
+  channel?: string
+  profile?: string
+  shortProfile?: string
+  summary?: string
+  description?: string
+  readmeUrl?: string
+  folderUrl?: string
+  upstreamNotes?: string
+  targets?: CustomTarget[]
 }
 
 /**
@@ -75,5 +105,8 @@ export interface DeviceHardware {
   url?: string,
   key?: string; // Optional key to differentiate multiple entries for the same hwModel
   variant?: string; // Optional variant to differentiate multiple entries for the same hwModel
+  variantName?: string; // Optional build variant folder name
+  customDescription?: string; // Optional custom board description
+  customRepoUrl?: string; // Optional custom repository URL
   isMaker?: boolean; // Independent maker hardware: ranked below Backer/Partner, above Community
 }

@@ -64,8 +64,8 @@
       "arch_not_built": "This PR build does not include {arch} firmware."
     },
     "instructions": "Choose from the release options or upload a release zip downloaded from Github.",
-    "stable": "Stable (or Beta)",
-    "unstable": "Unstable (Alpha)",
+    "stable": "Beta",
+    "unstable": "Alpha",
     "prerelease": "Pre-release",
     "nightly": "Nightly (develop)",
     "coming_soon": "Firmware coming soon",

@@ -68,7 +68,7 @@
           </span>
         </div>
         <a
-          :href="deviceStore.eraseUf2File"
+          :href="withBase(deviceStore.eraseUf2File)"
           download=""
           class="inline-flex w-[250px] justify-center items-center py-2 px-3 text-sm font-medium focus:outline-none bg-meshtastic rounded-lg hover:bg-white focus:z-10 focus:ring-4 focus:ring-gray-200 text-black"
         >
@@ -132,6 +132,7 @@ import {
   Info,
 } from 'lucide-vue-next'
 import { track } from '@vercel/analytics'
+import { withBase } from '~/utils/assetUrl'
 
 import { useDeviceStore } from '../../stores/deviceStore'
 import { useFirmwareStore } from '../../stores/firmwareStore'

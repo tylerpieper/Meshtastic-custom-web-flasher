@@ -24,6 +24,7 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
 
   app: {
+    baseURL: process.env.NUXT_APP_BASE_URL || '/',
     head: {
       script: process.env.COOKIEYES_CLIENT_ID
         ? [

@@ -6,6 +6,27 @@ import { eventMode } from '~/types/resources'
 // main_matrix.yml).
 export const RELEASE_BASE = 'https://release.meshtastic.org'
 
+// Raw base URL for custom builds repository
+export const CUSTOM_BUILDS_RAW_BASE = 'https://raw.githubusercontent.com/tylerpieper/meshtastic-custom-builds/main'
+
+// URL to static web flasher manifest in meshtastic-custom-builds
+export const CUSTOM_MANIFEST_URL = `${CUSTOM_BUILDS_RAW_BASE}/builds/web-flasher-manifest.json`
+
+/**
+ * URI encodes each path segment so spaces and special characters in directory names
+ * (e.g. 'pr-10531 - Multi MQTT') don't break HTTP requests.
+ */
+export function encodeRepoPath(path: string): string {
+  return path.split('/').map(segment => encodeURIComponent(segment)).join('/')
+}
+
+/**
+ * Returns the base raw URL for a given target's base path in custom builds repo.
+ */
+export function getCustomTargetRawUrl(basePath: string): string {
+  return `${CUSTOM_BUILDS_RAW_BASE}/${encodeRepoPath(basePath)}`
+}
+
 // Nightlies live in their own bucket/host, flat: everything sits at the root.
 export const NIGHTLY_BASE = 'https://nightly.meshtastic.org'
 

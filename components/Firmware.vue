@@ -142,17 +142,17 @@
             </li>
           </ul>
           <div
-            v-if="!store.couldntFetchFirmwareApi"
+            v-if="!store.couldntFetchFirmwareApi && filteredAlpha.length > 0"
             class="px-4 py-2 text-sm text-warning font-semibold border-theme-bottom border-theme-top"
           >
             {{ $t('firmware.unstable') }}
           </div>
           <ul
-            v-if="!store.couldntFetchFirmwareApi"
+            v-if="!store.couldntFetchFirmwareApi && filteredAlpha.length > 0"
             class="py-2 text-sm text-theme-muted"
             aria-labelledby="dropdownInformationButton"
           >
-            <li v-for="release in store.$state.alpha">
+            <li v-for="release in filteredAlpha" :key="release.id">
               <a
                 href="#"
                 class="block px-4 py-2 hover:text-meshtastic-dark hover:bg-surface-secondary cursor-pointer transition-colors"
@@ -163,17 +163,17 @@
             </li>
           </ul>
           <div
-            v-if="!store.couldntFetchFirmwareApi"
+            v-if="!store.couldntFetchFirmwareApi && filteredStable.length > 0"
             class="px-4 py-2 text-sm text-green-400 font-semibold border-theme-bottom border-theme-top"
           >
             {{ $t('firmware.stable') }}
           </div>
           <ul
-            v-if="!store.couldntFetchFirmwareApi"
+            v-if="!store.couldntFetchFirmwareApi && filteredStable.length > 0"
             class="py-2 text-sm text-theme-muted"
             aria-labelledby="dropdownInformationButton"
           >
-            <li v-for="release in store.$state.stable">
+            <li v-for="release in filteredStable" :key="release.id">
               <span
                 class="block px-4 py-2 hover:text-meshtastic-dark hover:bg-surface-secondary cursor-pointer transition-colors"
                 @click="setSelectedFirmware(release)"
@@ -182,6 +182,12 @@
               </span>
             </li>
           </ul>
+          <div
+            v-if="!store.couldntFetchFirmwareApi && filteredAlpha.length === 0 && filteredStable.length === 0"
+            class="px-4 py-3 text-sm text-theme-muted italic text-center"
+          >
+            No builds available for this board.
+          </div>
           <div
             v-if="store.couldntFetchFirmwareApi"
             class="px-3 sm:px-4 py-3 w-full sm:w-96 max-w-sm rounded-xl text-xs sm:text-sm border error-fetch-box break-words"
@@ -260,6 +266,12 @@ const selectedVersion = computed(() => {
 const canSelectFirmware = computed(() => {
   return (deviceStore.selectedTarget?.hwModel ?? 0) > 0
 })
+
+const availableReleases = computed(() => {
+  return store.availableForTarget(deviceStore.selectedTarget?.platformioTarget)
+})
+const filteredAlpha = computed(() => availableReleases.value.alpha)
+const filteredStable = computed(() => availableReleases.value.stable)
 
 /**
  * For a board the registry does not mark activelySupported, develop is the only

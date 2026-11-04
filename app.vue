@@ -283,6 +283,7 @@ import { useSerialMonitorStore } from './stores/serialMonitorStore'
 import { useThemeStore } from './stores/themeStore'
 import { useToastStore } from './stores/toastStore'
 import { useEventMode } from '~/composables/useEventMode'
+import { withBase } from '~/utils/assetUrl'
 import SurveyBanner from '~/components/survey/SurveyBanner.vue'
 import SurveyView from '~/components/survey/SurveyView.vue'
 
@@ -406,9 +407,9 @@ const monitorSerial = async () => {
 
 const selectedDeviceImage = computed(() => {
   if (deviceStore.selectedTarget?.images?.length) {
-    return `/img/devices/${deviceStore.selectedTarget.images[0]}`
+    return withBase(`/img/devices/${deviceStore.selectedTarget.images[0]}`)
   }
-  return themeStore.isDark ? '/img/devices/unknown-new.svg' : '/img/devices/unknown-new-light.svg'
+  return withBase(themeStore.isDark ? '/img/devices/unknown-new.svg' : '/img/devices/unknown-new-light.svg')
 })
 
 const connectionButtonLabel = computed(() => {

@@ -18,6 +18,8 @@ import {
 } from '~/types/resources'
 import {
   getFirmwareBaseUrl,
+  CUSTOM_MANIFEST_URL,
+  getCustomTargetRawUrl,
   NIGHTLY_BASE,
   nightlyState,
   setNightlyVersion,
@@ -50,6 +52,7 @@ import type {
   FirmwareReleases,
   FirmwareResource,
   PrBuildResponse,
+  CustomWebFlasherManifest,
 } from '../types/api'
 
 import {
@@ -62,6 +65,7 @@ import {
 
 import { createUrl } from './store'
 import { useToastStore } from './toastStore'
+import { useDeviceStore } from './deviceStore'
 
 const previews = showPrerelease ? [currentPrerelease] : []
 
@@ -269,7 +273,7 @@ export const useFirmwareStore = defineStore('firmware', {
     unsupportedDevicesUnlocked(): boolean {
       return this.konamiUnlocked && !!this.unlockNightly
     },
-    firmwareVersion: state => state.selectedFirmware?.id ? state.selectedFirmware.id.replace('v', '') : '.+',
+    firmwareVersion: state => state.selectedFirmware?.version || (state.selectedFirmware?.id ? state.selectedFirmware.id.replace(/^v/, '') : '.+'),
     canShowFlash: state => state.selectedFirmware?.id ? state.hasSeenReleaseNotes : true,
     // Guard the name too, not just the file: a File is only ever set from a real
     // upload, but reading these before one exists must not throw — they are
@@ -289,46 +293,82 @@ export const useFirmwareStore = defineStore('firmware', {
     continueToFlash() {
       this.hasSeenReleaseNotes = true
     },
+    isTargetAvailableForFirmware(firmware?: FirmwareResource, pioTarget?: string): boolean {
+      if (!firmware || !pioTarget) return false
+      if (firmware.targets) {
+        return firmware.targets.some(t => t.board === pioTarget || t.variantName === pioTarget)
+      }
+      return true
+    },
+    availableForTarget(pioTarget?: string): { stable: FirmwareResource[], alpha: FirmwareResource[] } {
+      if (!pioTarget) {
+        return { stable: this.stable, alpha: this.alpha }
+      }
+      return {
+        stable: this.stable.filter(r => this.isTargetAvailableForFirmware(r, pioTarget)),
+        alpha: this.alpha.filter(r => this.isTargetAvailableForFirmware(r, pioTarget)),
+      }
+    },
     async fetchList() {
       // Skip fetching firmware list in event mode - use locked firmware only
       if (eventMode.enabled) {
         console.log('Event mode enabled, skipping firmware API fetch')
-        // The locked build is pre-seeded into state, so setSelectedFirmware()
-        // never runs for it — and that is the only place the release manifest is
-        // fetched. Without it every event flash falls through to the legacy
-        // convention-based path, which uses stale partition offsets and asks for
-        // bleota*.bin (gone since 2.8). Resolve it here so event domains take the
-        // same manifest-driven path as flash.meshtastic.org.
         if (eventMode.firmware?.id && !this.releaseManifest) {
           await this.setSelectedFirmware(eventMode.firmware)
         }
         return
       }
 
+      try {
+        const response = await fetch(CUSTOM_MANIFEST_URL)
+        if (response.ok) {
+          const manifest = await response.json() as CustomWebFlasherManifest
+          if (manifest.releases) {
+            this.stable = manifest.releases.stable || []
+            this.alpha = manifest.releases.alpha || []
+            this.previews = []
+            this.nightly = []
+            this.pullRequests = []
+
+            const deviceStore = useDeviceStore()
+            if (deviceStore.selectedTarget) {
+              const available = this.availableForTarget(deviceStore.selectedTarget.platformioTarget)
+              const allAvailable = [...available.stable, ...available.alpha]
+              if (allAvailable.length > 0 && (!this.selectedFirmware?.id || !this.isTargetAvailableForFirmware(this.selectedFirmware, deviceStore.selectedTarget.platformioTarget))) {
+                await this.setSelectedFirmware(allAvailable[0])
+              }
+            }
+            else if (!this.selectedFirmware?.id && (this.stable.length > 0 || this.alpha.length > 0)) {
+              await this.setSelectedFirmware(this.stable[0] || this.alpha[0])
+            }
+            return
+          }
+        }
+      }
+      catch (err) {
+        console.warn('Failed to fetch custom builds manifest, falling back to upstream firmwareApi', err)
+      }
+
       firmwareApi.get<FirmwareReleases>()
         .then(async (response: FirmwareReleases) => {
-          // Fetch release notes for each firmware version from release.meshtastic.org
           const fetchReleaseNotesForList = async (releases: FirmwareResource[]) => {
             for (const release of releases) {
-              // Only fetch if we don't already have release notes from the API
               if (!release.release_notes || release.release_notes.trim().length === 0) {
                 release.release_notes = await fetchReleaseNotes(release.id)
               }
             }
           }
 
-          // Only grab the latest 4 releases
           this.stable = response.releases.stable.slice(0, 4)
           this.alpha = response.releases.alpha.filter(f => !f.title.includes('Preview')).slice(0, 4)
           this.previews = [
             ...response.releases.alpha
-              .filter(f => f.title.includes('Preview') && !f.title.includes('2.6.0')) // Exclude 2.6.0 preview
+              .filter(f => f.title.includes('Preview') && !f.title.includes('2.6.0'))
               .slice(0, 4),
             ...previews,
           ]
           this.pullRequests = response.pullRequests.slice(0, 4)
 
-          // Fetch release notes for all versions in parallel
           await Promise.all([
             fetchReleaseNotesForList(this.stable),
             fetchReleaseNotesForList(this.alpha),
@@ -518,25 +558,45 @@ export const useFirmwareStore = defineStore('firmware', {
       this.releaseManifestResolved = false
       this.probedBoards = undefined
 
+      // Custom builds manifest targets:
+      if (firmware.targets) {
+        this.releaseManifest = {
+          version: firmware.version || firmware.id,
+          targets: firmware.targets.map(t => ({ board: t.board, platform: t.platform })),
+        }
+        this.releaseManifestResolved = true
+      }
       // PR builds carry their targets list and synthesized release notes with
       // them — nothing is hosted on release.meshtastic.org for these versions
-      if (firmware.prBuild) {
+      else if (firmware.prBuild) {
         this.releaseManifest = { version: firmware.prBuild.version, targets: firmware.prBuild.targets }
         this.releaseManifestResolved = true
       }
 
+      // Fetch upstream release notes for custom firmware
+      if (firmware.targets) {
+        const cleanVer = firmware.version || firmware.id.replace(/^v/, '')
+        if (!firmware.upstreamNotes) {
+          try {
+            firmware.upstreamNotes = await fetchReleaseNotes(cleanVer)
+          }
+          catch {
+            firmware.upstreamNotes = ''
+          }
+        }
+      }
       // Fetch release notes if not already present
-      if (firmware.id && !firmware.prBuild && (!firmware.release_notes || firmware.release_notes.trim().length === 0)) {
+      else if (firmware.id && !firmware.prBuild && (!firmware.release_notes || firmware.release_notes.trim().length === 0)) {
         firmware.release_notes = await fetchReleaseNotes(firmware.id)
       }
 
-      // Auto-skip release notes step if there are no notes to show
-      if (!firmware.release_notes || firmware.release_notes.trim().length === 0) {
+      // Auto-skip release notes step if there are no notes to show and not custom
+      if (!firmware.targets && (!firmware.release_notes || firmware.release_notes.trim().length === 0)) {
         this.hasSeenReleaseNotes = true
       }
 
       // Fetch the release manifest that lists all available targets
-      if (firmware.id && !firmware.prBuild) {
+      if (firmware.id && !firmware.prBuild && !firmware.targets) {
         const releaseManifest = await fetchReleaseManifest(firmware.id)
         // A newer selection may have superseded this one mid-fetch; letting a
         // stale result mark itself resolved would unblock the wrong release.
@@ -561,6 +621,14 @@ export const useFirmwareStore = defineStore('firmware', {
     getReleaseFileUrl(fileName: string): string {
       // PR build files come from artifact zips, not release.meshtastic.org
       if (!this.selectedFirmware?.id || this.selectedFirmware.prBuild) return ''
+      if (this.selectedFirmware.targets) {
+        const deviceStore = useDeviceStore()
+        const selectedTargetBoard = deviceStore.selectedTargetBoard || deviceStore.selectedTarget?.platformioTarget
+        const target = this.selectedFirmware.targets.find(t => t.board === selectedTargetBoard || t.variantName === selectedTargetBoard)
+        if (target) {
+          return `${getCustomTargetRawUrl(target.basePath)}/${fileName}`
+        }
+      }
       return `${getFirmwareBaseUrl(this.selectedFirmware.id)}/${fileName}`
     },
     async downloadUf2FileSystem(searchRegex: RegExp, arch?: string) {
@@ -735,6 +803,38 @@ export const useFirmwareStore = defineStore('firmware', {
         this.manifest = undefined
         this.hasManifest = false
         return false
+      }
+
+      // Custom builds manifest targets:
+      if (this.selectedFirmware.targets) {
+        const target = this.selectedFirmware.targets.find(t => t.board === targetBoard || t.variantName === targetBoard)
+        if (!target) {
+          console.warn(`Target ${targetBoard} not found in custom firmware targets`)
+          this.manifest = undefined
+          this.hasManifest = false
+          return false
+        }
+        try {
+          const manifestFile = target.mtJson || `firmware-${targetBoard}-${this.selectedFirmware.version}.mt.json`
+          const url = `${getCustomTargetRawUrl(target.basePath)}/${manifestFile}`
+          const response = await fetch(url)
+          if (!response.ok) {
+            console.warn(`Could not fetch custom manifest from ${url}`)
+            this.manifest = undefined
+            this.hasManifest = false
+            return false
+          }
+          this.manifest = await response.json() as FirmwareManifest
+          this.hasManifest = true
+          console.log(`Loaded custom target manifest for ${targetBoard} from ${url}`)
+          return true
+        }
+        catch (error) {
+          console.error(`Error loading custom manifest for ${targetBoard}:`, error)
+          this.manifest = undefined
+          this.hasManifest = false
+          return false
+        }
       }
 
       // PR builds: read the target manifest from the artifact zip
@@ -1201,6 +1301,21 @@ export const useFirmwareStore = defineStore('firmware', {
         }
         const arrayBuffer = await entry.blob.arrayBuffer()
         return convertToBinaryString(new Uint8Array(arrayBuffer))
+      }
+      if (this.selectedFirmware?.targets) {
+        const deviceStore = useDeviceStore()
+        const selectedTargetBoard = deviceStore.selectedTargetBoard || deviceStore.selectedTarget?.platformioTarget
+        const target = this.selectedFirmware.targets.find(t => t.board === selectedTargetBoard || t.variantName === selectedTargetBoard)
+        if (target) {
+          const url = `${getCustomTargetRawUrl(target.basePath)}/${fileName}`
+          const response = await fetch(url)
+          if (!response.ok) {
+            throw new Error(`Could not download ${fileName} (HTTP ${response.status} from ${url})`)
+          }
+          const blob = await response.blob()
+          const data = await blob.arrayBuffer()
+          return convertToBinaryString(new Uint8Array(data))
+        }
       }
       if (this.selectedFirmware?.id) {
         const baseUrl = getFirmwareBaseUrl(this.selectedFirmware.id)

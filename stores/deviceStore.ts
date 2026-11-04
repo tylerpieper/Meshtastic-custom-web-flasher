@@ -4,6 +4,7 @@ import {
   eventMode,
   vendorCobrandingTag,
 } from '~/types/resources'
+import { CUSTOM_MANIFEST_URL } from '~/utils/firmwareUrl'
 import { MAKER_TIER_FILTER, deviceTier } from '~/utils/deviceTier'
 import { applyEventDeviceOverrides } from '~/utils/eventDevices'
 import { isUnsupportedDevice } from '~/utils/unsupportedDevices'
@@ -235,6 +236,20 @@ export const useDeviceStore = defineStore('device', {
   actions: {
     async fetchList() {
       try {
+        const response = await fetch(CUSTOM_MANIFEST_URL)
+        if (response.ok) {
+          const manifest = await response.json() as { devices?: DeviceHardware[] }
+          if (manifest.devices && manifest.devices.length > 0) {
+            this.setTargetsList(manifest.devices)
+            return
+          }
+        }
+      }
+      catch (ex) {
+        console.warn('Could not fetch custom manifest devices, falling back to API / offline list', ex)
+      }
+
+      try {
         // First try to fetch from the API
         const targets = await firmwareApi.get<DeviceHardware[]>()
         this.setTargetsList(targets)
@@ -283,18 +298,25 @@ export const useDeviceStore = defineStore('device', {
       const firmwareStore = useFirmwareStore()
 
       await new Promise(_ => setTimeout(_, 250))
-      // A board the registry does not mark activelySupported is pinned to the
-      // nightly, overriding whatever was selected for the previous target:
-      // develop is the only branch guaranteed to still build its variant.
-      // Firmware.vue offers nothing else while such a board is selected, so
-      // this is the only build it can ever be flashed with. The reveal is
-      // gated on this nightly existing, so it is present here.
+
       if (isUnsupportedDevice(target)) {
         const nightly = firmwareStore.unlockNightly
         if (nightly) firmwareStore.setSelectedFirmware(nightly)
       }
-      else if (!firmwareStore.hasFirmwareFile && !firmwareStore.hasOnlineFirmware && !firmwareStore.prDeepLinkPending && firmwareStore.stable.length > 0) {
-        firmwareStore.setSelectedFirmware(firmwareStore.stable[0])
+      else {
+        // Check whether current firmware selection is valid for this newly selected target
+        const available = firmwareStore.availableForTarget(target.platformioTarget)
+        const allAvailable = [...available.stable, ...available.alpha]
+
+        if (allAvailable.length > 0) {
+          const currentValid = firmwareStore.selectedFirmware && firmwareStore.isTargetAvailableForFirmware(firmwareStore.selectedFirmware, target.platformioTarget)
+          if (!currentValid) {
+            await firmwareStore.setSelectedFirmware(allAvailable[0])
+          }
+        }
+        else if (!firmwareStore.hasFirmwareFile && !firmwareStore.hasOnlineFirmware && !firmwareStore.prDeepLinkPending && firmwareStore.stable.length > 0) {
+          firmwareStore.setSelectedFirmware(firmwareStore.stable[0])
+        }
       }
 
       // Auto-select MUI for supported variants except Heltec V4.
