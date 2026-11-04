@@ -73,11 +73,33 @@
                   <div class="absolute top-3 left-3 w-8 h-8 rounded-full step-badge-circle flex items-center justify-center">
                     <span class="step-number">1</span>
                   </div>
-                  <img
-                    :src="selectedDeviceImage"
-                    class="h-40 w-40 mb-4 mx-auto object-contain drop-shadow-lg"
-                    :alt="$t('device.title')"
-                  >
+                  <div class="relative h-40 w-40 mb-4 mx-auto flex items-center justify-center">
+                    <img
+                      :src="selectedDeviceImage"
+                      class="h-40 w-40 object-contain drop-shadow-lg"
+                      :alt="$t('device.title')"
+                      @error="onSelectedImageError"
+                    >
+                    <!-- Spicy Overlay in Step 1 -->
+                    <div
+                      v-if="selectedDeviceBadge?.isSpicy"
+                      class="absolute bottom-1 right-1 z-10 flex items-center gap-1 bg-red-950/90 border border-red-500/80 rounded-full px-2.5 py-1 shadow-lg backdrop-blur-sm pointer-events-none select-none"
+                    >
+                      <span class="text-lg leading-none">🌶️</span>
+                      <span
+                        v-if="selectedDeviceBadge.label"
+                        class="text-xs font-extrabold text-red-200 tracking-wider font-mono uppercase"
+                      >{{ selectedDeviceBadge.label }}</span>
+                    </div>
+
+                    <!-- SolarXiao Overlay in Step 1 -->
+                    <div
+                      v-else-if="selectedDeviceBadge?.isSolarXiao"
+                      class="absolute bottom-1 right-1 z-10 flex items-center bg-amber-950/90 border border-amber-500/80 rounded-full px-2.5 py-1 shadow-lg backdrop-blur-sm pointer-events-none select-none"
+                    >
+                      <span class="text-xl leading-none">☀️</span>
+                    </div>
+                  </div>
                   <Device />
                 </div>
                 <h2 class="text-xl sm:text-xl font-semibold title-doto text-theme mt-5 tracking-wide">
@@ -284,6 +306,7 @@ import { useThemeStore } from './stores/themeStore'
 import { useToastStore } from './stores/toastStore'
 import { useEventMode } from '~/composables/useEventMode'
 import { withBase } from '~/utils/assetUrl'
+import { getDeviceBadge, getUnknownDeviceIcon } from '~/utils/deviceIcon'
 import SurveyBanner from '~/components/survey/SurveyBanner.vue'
 import SurveyView from '~/components/survey/SurveyView.vue'
 
@@ -405,12 +428,26 @@ const monitorSerial = async () => {
   await serialMonitorStore.monitorSerial()
 }
 
+const selectedDeviceBadge = computed(() => {
+  const target = deviceStore.selectedTarget
+  return getDeviceBadge(target?.platformioTarget || target?.variantName)
+})
+
 const selectedDeviceImage = computed(() => {
   if (deviceStore.selectedTarget?.images?.length) {
     return withBase(`/img/devices/${deviceStore.selectedTarget.images[0]}`)
   }
-  return withBase(themeStore.isDark ? '/img/devices/unknown-new.svg' : '/img/devices/unknown-new-light.svg')
+  if (selectedDeviceBadge.value?.isSpicy || selectedDeviceBadge.value?.isSolarXiao) {
+    return withBase('/img/devices/seeed_xiao_nrf52_kit.svg')
+  }
+  return withBase(getUnknownDeviceIcon(themeStore.isDark))
 })
+
+const onSelectedImageError = (event) => {
+  if (event?.target) {
+    event.target.src = withBase(getUnknownDeviceIcon(themeStore.isDark))
+  }
+}
 
 const connectionButtonLabel = computed(() => {
   if (firmwareStore.isFlashing) {

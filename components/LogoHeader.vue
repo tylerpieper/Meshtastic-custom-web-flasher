@@ -272,22 +272,6 @@
       v-else
       class="logo-header-content"
     >
-      <div class="logo-container">
-        <div class="logo-glow">
-          <img
-            v-if="themeStore.isDark"
-            src="@/assets/img/logo.svg"
-            class="logo-icon"
-            alt="Meshtastic Logo"
-          >
-          <img
-            v-else
-            src="@/assets/img/logo-dark.svg"
-            class="logo-icon"
-            alt="Meshtastic Logo"
-          >
-        </div>
-      </div>
       <h1 class="logo-title">
         <span class="logo-title-gradient">{{ $t('header_title') }}</span>
       </h1>
@@ -518,7 +502,6 @@ const { eventMode } = useEventMode()
   font-size: 2rem;
   font-weight: 700;
   letter-spacing: 0.05em;
-  text-transform: uppercase;
   margin: 0;
   color: var(--text-default);
 }

@@ -56,24 +56,48 @@
       >
     </div>
     <div
-      v-if="props.device.images?.length"
-      class="relative w-24 h-24 sm:w-32 sm:h-32 m-2"
+      v-if="deviceImages.length"
+      class="relative w-24 h-24 sm:w-32 sm:h-32 m-2 flex items-center justify-center"
     >
       <img
-        v-for="(image, index) in props.device.images"
+        v-for="(image, index) in deviceImages"
         :key="image"
-        class="absolute inset-0 w-24 h-24 sm:w-32 sm:h-32"
+        class="absolute inset-0 w-24 h-24 sm:w-32 sm:h-32 object-contain"
         :style="{ left: `${index * 15}px` }"
         :src="withBase(`img/devices/${image}`)"
         :alt="props.device.displayName"
+        @error="onImageError"
+      >
+      <!-- Spicy Badge Overlay -->
+      <div
+        v-if="badgeInfo?.isSpicy"
+        class="absolute bottom-0 right-0 z-10 flex items-center gap-0.5 sm:gap-1 bg-red-950/90 border border-red-500/80 rounded-full px-1.5 sm:px-2 py-0.5 shadow-md backdrop-blur-sm pointer-events-none select-none"
+      >
+        <span class="text-sm sm:text-base leading-none">🌶️</span>
+        <span
+          v-if="badgeInfo.label"
+          class="text-[9px] sm:text-[11px] font-extrabold text-red-200 tracking-wider font-mono uppercase"
+        >{{ badgeInfo.label }}</span>
+      </div>
+
+      <!-- SolarXiao Badge Overlay -->
+      <div
+        v-else-if="badgeInfo?.isSolarXiao"
+        class="absolute bottom-0 right-0 z-10 flex items-center bg-amber-950/90 border border-amber-500/80 rounded-full px-1.5 sm:px-2 py-0.5 shadow-md backdrop-blur-sm pointer-events-none select-none"
+      >
+        <span class="text-sm sm:text-base leading-none">☀️</span>
+      </div>
+    </div>
+    <div
+      v-else
+      class="relative w-24 h-24 sm:w-32 sm:h-32 m-2 flex items-center justify-center"
+    >
+      <img
+        class="w-24 h-24 sm:w-32 sm:h-32 object-contain"
+        :src="withBase(getUnknownDeviceIcon(themeStore.isDark))"
+        :alt="props.device.displayName"
       >
     </div>
-    <img
-      v-else
-      class="w-24 h-24 sm:w-32 sm:h-32 m-2"
-      :src="withBase('img/devices/unknown.svg')"
-      :alt="props.device.displayName"
-    >
     <div class="flex justify-start w-full">
       <div
         v-if="props.device.supportLevel! < 3"
@@ -103,7 +127,9 @@ import { withBase } from '~/utils/assetUrl'
 import { requiresHamLicense } from '~/utils/deviceBadges'
 import { deviceTier } from '~/utils/deviceTier'
 import { isUnsupportedDevice } from '~/utils/unsupportedDevices'
+import { getDeviceBadge, getUnknownDeviceIcon } from '~/utils/deviceIcon'
 import { useFirmwareStore } from '../stores/firmwareStore'
+import { useThemeStore } from '../stores/themeStore'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -138,6 +164,27 @@ const tierLabel = computed(() => {
   if (tier.value === 'maker') return t('device.maker_devices')
   return t('device.diy_devices')
 })
+
+const themeStore = useThemeStore()
+
+const badgeInfo = computed(() => {
+  return getDeviceBadge(props.device.platformioTarget || props.device.variantName)
+})
+
+const deviceImages = computed(() => {
+  if (props.device.images?.length) {
+    return props.device.images
+  }
+  if (badgeInfo.value?.isSpicy || badgeInfo.value?.isSolarXiao) {
+    return ['seeed_xiao_nrf52_kit.svg']
+  }
+  return []
+})
+
+const onImageError = (event: Event) => {
+  const target = event.target as HTMLImageElement
+  target.src = withBase(getUnknownDeviceIcon(themeStore.isDark))
+}
 
 const deviceUrl = computed(() => {
   if (props.device.url) {
