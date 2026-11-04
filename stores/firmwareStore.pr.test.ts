@@ -327,6 +327,30 @@ describe('firmwareStore PR builds', () => {
       const urls = fetchMock.mock.calls.map(call => String(call[0]))
       expect(urls.some(url => url.includes('release.meshtastic.org'))).toBe(true)
     })
+
+    it('serves custom builds repo raw URL for custom releases with optional targetBoard override', async () => {
+      const store = useFirmwareStore()
+      await store.setSelectedFirmware({
+        id: 'alpha-v2.8.2.d5f1619/pr-10531 - Multi MQTT',
+        title: '2.8.2.d5f1619/MQTT-Multi',
+        version: '2.8.2.d5f1619',
+        targets: [
+          {
+            board: 'spicy_e22p_i2c',
+            variantName: 'spicy_e22p_i2c',
+            platform: 'nrf52840',
+            basePath: 'builds/alpha-v2.8.2.d5f1619/pr-10531 - Multi MQTT/spicy_e22p_i2c',
+            boardFolderUrl: '',
+            mtJson: 'firmware-spicy_e22p_i2c-2.8.2.d5f1619.mt.json',
+          },
+        ],
+      })
+
+      const url = store.getReleaseFileUrl('firmware-spicy_e22p_i2c-2.8.2.d5f1619.uf2', 'spicy_e22p_i2c')
+      expect(url).toBe(
+        'https://raw.githubusercontent.com/tylerpieper/meshtastic-custom-builds/main/builds/alpha-v2.8.2.d5f1619/pr-10531%20-%20Multi%20MQTT/spicy_e22p_i2c/firmware-spicy_e22p_i2c-2.8.2.d5f1619.uf2'
+      )
+    })
   })
 
   describe('isPrTargetAvailable', () => {

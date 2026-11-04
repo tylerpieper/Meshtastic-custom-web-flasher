@@ -6,6 +6,7 @@ import {
   setNightlyVersion,
   RELEASE_BASE,
   NIGHTLY_BASE,
+  getCustomTargetRawUrl,
 } from './firmwareUrl'
 import { eventMode } from '~/types/resources'
 
@@ -129,6 +130,14 @@ describe('firmwareUrl', () => {
     it('has the correct nightly base URL', () => {
       console.log(`[BASE URL] NIGHTLY_BASE = ${NIGHTLY_BASE}`)
       expect(NIGHTLY_BASE).toBe('https://nightly.meshtastic.org')
+    })
+
+    it('correctly encodes repo paths with spaces and special characters', () => {
+      const path = 'builds/alpha-v2.8.2.d5f1619/pr-10531 - Multi MQTT/spicy_e22p_i2c'
+      const encoded = getCustomTargetRawUrl(path)
+      expect(encoded).toBe(
+        'https://raw.githubusercontent.com/tylerpieper/meshtastic-custom-builds/main/builds/alpha-v2.8.2.d5f1619/pr-10531%20-%20Multi%20MQTT/spicy_e22p_i2c'
+      )
     })
   })
 })

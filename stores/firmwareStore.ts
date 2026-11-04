@@ -81,22 +81,38 @@ const prZipPromises = new Map<string, Promise<Blob>>()
 let activeFlash: Record<string, unknown> | undefined
 
 /**
- * Fetch release notes from release.meshtastic.org
+ * Fetch release notes from release.meshtastic.org with GitHub API fallback
  */
 async function fetchReleaseNotes(version: string): Promise<string> {
+  const cleanVersion = version.replace(/^v/, '')
+  // 1. Try release.meshtastic.org
   try {
     const url = `${getFirmwareBaseUrl(version)}/release_notes.md`
     const response = await fetch(url)
-    if (!response.ok) {
-      console.warn(`Could not fetch release notes from ${url}`)
-      return ''
+    if (response.ok) {
+      return await response.text()
     }
-    return await response.text()
   }
-  catch (error) {
-    console.warn(`Error fetching release notes for version ${version}:`, error)
-    return ''
+  catch {
+    // Expected CORS restriction when hosted on custom domains or GitHub Pages
   }
+
+  // 2. Fallback to GitHub API (CORS friendly for all web origins)
+  try {
+    const ghUrl = `https://api.github.com/repos/meshtastic/firmware/releases/tags/v${cleanVersion}`
+    const ghResponse = await fetch(ghUrl)
+    if (ghResponse.ok) {
+      const data = await ghResponse.json() as { body?: string }
+      if (data.body) {
+        return data.body
+      }
+    }
+  }
+  catch (ghError) {
+    console.warn(`Error fetching release notes from GitHub API for v${cleanVersion}:`, ghError)
+  }
+
+  return ''
 }
 
 /**
@@ -193,6 +209,7 @@ export const useFirmwareStore = defineStore('firmware', {
       // use. Stands in for releaseManifest.targets on those releases so the
       // chooser and the filename logic work from real data there too.
       probedBoards: <Set<string> | undefined>undefined,
+      upstreamNotes: <string | undefined>undefined,
       eventModeEnabled: eventMode.enabled,
     }
   },
@@ -576,12 +593,15 @@ export const useFirmwareStore = defineStore('firmware', {
       // Fetch upstream release notes for custom firmware
       if (firmware.targets) {
         const cleanVer = firmware.version || firmware.id.replace(/^v/, '')
-        if (!firmware.upstreamNotes) {
+        this.upstreamNotes = firmware.upstreamNotes || undefined
+        if (!this.upstreamNotes) {
           try {
-            firmware.upstreamNotes = await fetchReleaseNotes(cleanVer)
+            const notes = await fetchReleaseNotes(cleanVer)
+            this.upstreamNotes = notes
+            firmware.upstreamNotes = notes
           }
           catch {
-            firmware.upstreamNotes = ''
+            this.upstreamNotes = ''
           }
         }
       }
@@ -618,13 +638,13 @@ export const useFirmwareStore = defineStore('firmware', {
         firmware_channel: this.firmwareChannel,
       })
     },
-    getReleaseFileUrl(fileName: string): string {
+    getReleaseFileUrl(fileName: string, targetBoard?: string): string {
       // PR build files come from artifact zips, not release.meshtastic.org
       if (!this.selectedFirmware?.id || this.selectedFirmware.prBuild) return ''
       if (this.selectedFirmware.targets) {
         const deviceStore = useDeviceStore()
-        const selectedTargetBoard = deviceStore.selectedTargetBoard || deviceStore.selectedTarget?.platformioTarget
-        const target = this.selectedFirmware.targets.find(t => t.board === selectedTargetBoard || t.variantName === selectedTargetBoard)
+        const boardToFind = targetBoard || deviceStore.selectedTargetBoard || deviceStore.selectedTarget?.platformioTarget
+        const target = this.selectedFirmware.targets.find(t => t.board === boardToFind || t.variantName === boardToFind)
         if (target) {
           return `${getCustomTargetRawUrl(target.basePath)}/${fileName}`
         }

@@ -86,7 +86,7 @@ const renderReleaseNotes = async () => {
     lines.push('')
     lines.push(`### Upstream Meshtastic v${fw.version} Release Notes`)
     lines.push('')
-    lines.push(fw.upstreamNotes || '_No upstream release notes available._')
+    lines.push(firmwareStore.upstreamNotes || fw.upstreamNotes || '_No upstream release notes available._')
 
     markdownContent = lines.join('\n')
   }
@@ -109,7 +109,7 @@ const renderReleaseNotes = async () => {
 
 // Re-render whenever the selected firmware, upstreamNotes, or target changes
 watch(
-  [() => firmwareStore.selectedFirmware?.id, () => firmwareStore.selectedFirmware?.upstreamNotes, () => deviceStore.selectedTarget?.platformioTarget],
+  [() => firmwareStore.selectedFirmware?.id, () => firmwareStore.upstreamNotes, () => firmwareStore.selectedFirmware?.upstreamNotes, () => deviceStore.selectedTarget?.platformioTarget],
   () => { renderReleaseNotes() },
   { immediate: true },
 )

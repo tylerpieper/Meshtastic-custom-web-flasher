@@ -177,7 +177,7 @@ watch(() => legacyProbeBoards.value.join('|'), async (key, _previous, onCleanup)
   const boards = legacyProbeBoards.value
   const extension = ['nrf52840', 'rp2040'].includes(deviceStore.selectedArchitecture) ? '.uf2' : '-update.bin'
   const found = await Promise.all(boards.map((board) => {
-    const url = firmwareStore.getReleaseFileUrl(`firmware-${board}-${firmwareStore.firmwareVersion}${extension}`)
+    const url = firmwareStore.getReleaseFileUrl(`firmware-${board}-${firmwareStore.firmwareVersion}${extension}`, board)
     return url ? checkIfRemoteFileExists(url) : Promise.resolve(false)
   }))
   // A newer selection may have started its own probe while this one was in

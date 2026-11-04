@@ -249,12 +249,12 @@ const canInstallInkHud = computed(() => {
 // button re-rendered, whether or not anyone clicked it.
 const getDownloadUf2Url = (target?: DeviceHardware) => {
   if (!target || !firmwareStore.selectedFirmware?.id) return ''
-  const firmwareVersion = firmwareStore.selectedFirmware.id.replace('v', '')
+  const firmwareVersion = firmwareStore.selectedFirmware.version || firmwareStore.firmwareVersion
   let suffix = ''
   if (firmwareStore.shouldInstallInkHud) {
     suffix = '-inkhud'
   }
   const firmwareFile = `firmware-${target.platformioTarget}${suffix}-${firmwareVersion}.uf2`
-  return firmwareStore.getReleaseFileUrl(firmwareFile)
+  return firmwareStore.getReleaseFileUrl(firmwareFile, target.platformioTarget)
 }
 </script>

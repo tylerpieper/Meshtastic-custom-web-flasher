@@ -333,7 +333,7 @@ watch(() => firmwareStore.$state.shouldCleanInstall, async () => {
     canBundleWebUI.value = false
   }
   else if (firmwareStore.selectedFirmware) {
-    canBundleWebUI.value = await checkIfRemoteFileExists(firmwareStore.getReleaseFileUrl(littleFsFileName.value)) && !firmwareStore.$state.shouldInstallMui
+    canBundleWebUI.value = await checkIfRemoteFileExists(firmwareStore.getReleaseFileUrl(littleFsFileName.value, targetBoard.value)) && !firmwareStore.$state.shouldInstallMui
   }
   else {
     canBundleWebUI.value = false
