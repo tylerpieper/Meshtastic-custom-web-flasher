@@ -1,9 +1,9 @@
 {
-  "title": "tapedeck's web flasher",
+  "title": "TAPEDECK'S WEB FLASHER",
   "header": "Flasher",
   "description": "Flash custom and community firmware builds straight from your browser",
   "browser_warning": "Your browser does not support the WebSerial API. Please switch to a compatible browser, such as Chrome or Edge, for full functionality.",
-  "header_title": "tapedeck's web flasher",
+  "header_title": "TAPEDECK'S WEB FLASHER",
   "language": "Language",
   "actions": {
     "connect": "Connect",

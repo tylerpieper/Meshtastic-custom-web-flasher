@@ -502,6 +502,7 @@ const { eventMode } = useEventMode()
   font-size: 2rem;
   font-weight: 700;
   letter-spacing: 0.05em;
+  text-transform: uppercase;
   margin: 0;
   color: var(--text-default);
 }
