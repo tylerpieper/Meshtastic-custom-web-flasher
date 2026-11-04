@@ -73,6 +73,33 @@ const renderReleaseNotes = async () => {
       lines.push('')
     }
 
+    const downloadLinks: string[] = []
+    if (target) {
+      const uf2File = target.uf2File || (target.platform?.startsWith('nrf52') || target.platform?.startsWith('rp2040') ? `firmware-${target.board}-${fw.version}.uf2` : undefined)
+      const otaZip = target.otaZip || (target.platform?.startsWith('nrf52') ? `firmware-${target.board}-${fw.version}-ota.zip` : undefined)
+      if (uf2File) {
+        const uf2Url = firmwareStore.getReleaseFileUrl(uf2File, target.board)
+        if (uf2Url) downloadLinks.push(`  * [Download UF2 (USB DFU): \`${uf2File}\`](${uf2Url})`)
+      }
+      if (otaZip) {
+        const otaUrl = firmwareStore.getReleaseFileUrl(otaZip, target.board)
+        if (otaUrl) downloadLinks.push(`  * [Download OTA ZIP (BLE DFU): \`${otaZip}\`](${otaUrl})`)
+      }
+      if (target.factoryBin) {
+        const factoryUrl = firmwareStore.getReleaseFileUrl(target.factoryBin, target.board)
+        if (factoryUrl) downloadLinks.push(`  * [Download Factory BIN (Clean Install): \`${target.factoryBin}\`](${factoryUrl})`)
+      }
+      if (target.updateBin) {
+        const updateUrl = firmwareStore.getReleaseFileUrl(target.updateBin, target.board)
+        if (updateUrl) downloadLinks.push(`  * [Download Update BIN: \`${target.updateBin}\`](${updateUrl})`)
+      }
+    }
+    if (downloadLinks.length > 0) {
+      lines.push('* **Direct Firmware Downloads:**')
+      lines.push(...downloadLinks)
+      lines.push('')
+    }
+
     lines.push('* **Repository Links:**')
     if (fw.readmeUrl) {
       lines.push(`  * [View Flavor Documentation & Notes](${fw.readmeUrl})`)

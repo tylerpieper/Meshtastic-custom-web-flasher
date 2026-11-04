@@ -121,7 +121,8 @@
       "auto_reboot_warning": "The auto reboot may cause messages about file transfer failures, write errors, or the device being ejected",
       "install_inkhud": "Install InkHUD display",
       "enter_dfu": "Enter DFU Mode",
-      "download_uf2": "Download UF2"
+      "download_uf2": "Download UF2 (USB DFU)",
+      "download_ota_zip": "Download OTA ZIP (BLE DFU)"
     },
     "erase_uf2": {
       "warning": "After erasing flash, this operation will not be available again until new Meshtastic firmware is flashed on the device.",

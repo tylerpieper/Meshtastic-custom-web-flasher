@@ -25,6 +25,7 @@ const V281 = new Set([
 describe('variantBoard', () => {
   it('appends the variant suffix', () => {
     expect(variantBoard('t-deck', 'mui')).toBe('t-deck-tft')
+    expect(variantBoard('heltec-v4-r8-oled', 'mui')).toBe('heltec-v4-r8-tft')
     expect(variantBoard('t-echo', 'inkhud')).toBe('t-echo-inkhud')
   })
 

@@ -26,6 +26,9 @@ const VARIANT_SUFFIX: Record<FirmwareVariant, string> = {
 export function variantBoard(pioTarget: string, variant: FirmwareVariant): string {
   const suffix = VARIANT_SUFFIX[variant]
   if (!suffix || pioTarget.endsWith(suffix)) return pioTarget
+  if (variant === 'mui' && pioTarget.endsWith('-oled')) {
+    return `${pioTarget.slice(0, -'-oled'.length)}${suffix}`
+  }
   return `${pioTarget}${suffix}`
 }
 

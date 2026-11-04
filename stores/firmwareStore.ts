@@ -313,7 +313,12 @@ export const useFirmwareStore = defineStore('firmware', {
     isTargetAvailableForFirmware(firmware?: FirmwareResource, pioTarget?: string): boolean {
       if (!firmware || !pioTarget) return false
       if (firmware.targets) {
-        return firmware.targets.some(t => t.board === pioTarget || t.variantName === pioTarget)
+        const candidates = [
+          pioTarget,
+          variantBoard(pioTarget, 'mui'),
+          variantBoard(pioTarget, 'inkhud'),
+        ]
+        return firmware.targets.some(t => candidates.includes(t.board) || candidates.includes(t.variantName))
       }
       return true
     },

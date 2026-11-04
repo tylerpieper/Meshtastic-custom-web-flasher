@@ -28,6 +28,10 @@ export interface CustomTarget {
   basePath: string
   boardFolderUrl?: string
   mtJson?: string
+  uf2File?: string
+  otaZip?: string
+  factoryBin?: string
+  updateBin?: string
 }
 
 export interface CustomWebFlasherManifest {

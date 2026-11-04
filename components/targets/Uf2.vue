@@ -106,14 +106,26 @@
       <template v-if="hasVariantChoices">
         <div class="grid gap-3">
           <template v-for="variant in variantTargets" :key="variant.platformioTarget">
-            <a
+            <div
               v-if="firmwareStore.selectedFirmware?.id && !firmwareStore.isPrBuild"
-              :href="getDownloadUf2Url(variant)"
-              class="w-full text-gray-900 bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-800 shadow-lg shadow-green-800/50 font-medium rounded-lg text-sm px-5 py-3 text-center transition-all"
-              @click="trackUf2Download(variant)"
+              class="grid grid-cols-1 sm:grid-cols-2 gap-3"
             >
-              {{ formatVariantLabel(variant) }} &ndash; {{ $t('flash.uf2.download_uf2') }}
-            </a>
+              <a
+                :href="getDownloadUf2Url(variant)"
+                class="w-full text-gray-900 bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-800 shadow-lg shadow-green-800/50 font-medium rounded-lg text-sm px-5 py-3 text-center transition-all"
+                @click="trackUf2Download(variant)"
+              >
+                {{ formatVariantLabel(variant) }} &ndash; {{ $t('flash.uf2.download_uf2') }}
+              </a>
+              <a
+                v-if="getDownloadOtaZipUrl(variant)"
+                :href="getDownloadOtaZipUrl(variant)"
+                class="w-full text-meshtastic border border-meshtastic hover:bg-meshtastic hover:text-gray-900 focus:ring-4 focus:outline-none focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-3 text-center transition-all"
+                @click="trackUf2Download(variant)"
+              >
+                {{ formatVariantLabel(variant) }} &ndash; {{ $t('flash.uf2.download_ota_zip') }}
+              </a>
+            </div>
             <button
               v-else
               type="button"
@@ -126,14 +138,26 @@
         </div>
       </template>
       <template v-else>
-        <a
+        <div
           v-if="firmwareStore.selectedFirmware?.id && !firmwareStore.isPrBuild"
-          :href="getDownloadUf2Url(deviceStore.$state.selectedTarget)"
-          class="block w-full text-gray-900 bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-800 shadow-lg shadow-green-800/50 font-medium rounded-lg text-sm px-5 py-3 text-center transition-all"
-          @click="trackUf2Download(deviceStore.$state.selectedTarget)"
+          class="grid grid-cols-1 sm:grid-cols-2 gap-3"
         >
-          {{ $t('flash.uf2.download_uf2') }}
-        </a>
+          <a
+            :href="getDownloadUf2Url(deviceStore.$state.selectedTarget)"
+            class="block w-full text-gray-900 bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-800 shadow-lg shadow-green-800/50 font-medium rounded-lg text-sm px-5 py-3 text-center transition-all"
+            @click="trackUf2Download(deviceStore.$state.selectedTarget)"
+          >
+            {{ $t('flash.uf2.download_uf2') }}
+          </a>
+          <a
+            v-if="getDownloadOtaZipUrl(deviceStore.$state.selectedTarget)"
+            :href="getDownloadOtaZipUrl(deviceStore.$state.selectedTarget)"
+            class="block w-full text-meshtastic border border-meshtastic hover:bg-meshtastic hover:text-gray-900 focus:ring-4 focus:outline-none focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-3 text-center transition-all"
+            @click="trackUf2Download(deviceStore.$state.selectedTarget)"
+          >
+            {{ $t('flash.uf2.download_ota_zip') }}
+          </a>
+        </div>
         <button
           v-else
           type="button"
@@ -254,7 +278,27 @@ const getDownloadUf2Url = (target?: DeviceHardware) => {
   if (firmwareStore.shouldInstallInkHud) {
     suffix = '-inkhud'
   }
-  const firmwareFile = `firmware-${target.platformioTarget}${suffix}-${firmwareVersion}.uf2`
-  return firmwareStore.getReleaseFileUrl(firmwareFile, target.platformioTarget)
+  const boardName = `${target.platformioTarget}${suffix}`
+  const customTarget = firmwareStore.selectedFirmware.targets?.find(
+    t => t.board === boardName || t.variantName === boardName,
+  )
+  const firmwareFile = customTarget?.uf2File || `firmware-${boardName}-${firmwareVersion}.uf2`
+  return firmwareStore.getReleaseFileUrl(firmwareFile, boardName)
+}
+
+const getDownloadOtaZipUrl = (target?: DeviceHardware) => {
+  if (!target || !firmwareStore.selectedFirmware?.id) return ''
+  if (!target.architecture?.startsWith('nrf52')) return ''
+  const firmwareVersion = firmwareStore.selectedFirmware.version || firmwareStore.firmwareVersion
+  let suffix = ''
+  if (firmwareStore.shouldInstallInkHud) {
+    suffix = '-inkhud'
+  }
+  const boardName = `${target.platformioTarget}${suffix}`
+  const customTarget = firmwareStore.selectedFirmware.targets?.find(
+    t => t.board === boardName || t.variantName === boardName,
+  )
+  const otaFile = customTarget?.otaZip || `firmware-${boardName}-${firmwareVersion}-ota.zip`
+  return firmwareStore.getReleaseFileUrl(otaFile, boardName)
 }
 </script>
