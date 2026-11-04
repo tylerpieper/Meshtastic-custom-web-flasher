@@ -21,7 +21,7 @@
               <p class="mt-2">{{ $t('flash.esp32.reset_alternative') }}</p>
               <button
                 type="button"
-                class="inline-flex items-center gap-2 mt-3 px-4 py-2 text-sm font-medium text-gray-900 bg-meshtastic rounded-lg hover:bg-green-300 focus:ring-4 focus:ring-green-800 transition-colors"
+                class="inline-flex items-center gap-2 mt-3 px-4 py-2 text-sm font-medium text-gray-900 bg-meshtastic rounded-lg hover:bg-orange-300 focus:ring-4 focus:ring-orange-800 transition-colors"
                 @click="deviceStore.baud1200()"
               >
                 <Cpu class="w-4 h-4" />
@@ -42,7 +42,7 @@
           </h3>
           <select
             v-model="firmwareStore.$state.baudRate"
-            class="border text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2.5 text-theme bg-surface-primary border-theme"
+            class="border text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5 text-theme bg-surface-primary border-theme"
           >
             <option value="115200">115200</option>
             <option value="230400">230400</option>
@@ -86,7 +86,7 @@
                 type="checkbox"
                 class="sr-only peer"
               >
-              <div class="w-11 h-6 bg-gray-400 dark:bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-800 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600" />
+              <div class="w-11 h-6 bg-gray-400 dark:bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-800 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500" />
               <img
                 :src="withBase('img/Meshtastic-UI-Long.svg')"
                 class="h-5 ms-3"
@@ -103,7 +103,7 @@
                 type="checkbox"
                 class="sr-only peer"
               >
-              <div class="w-11 h-6 bg-gray-400 dark:bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-800 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600" />
+              <div class="w-11 h-6 bg-gray-400 dark:bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-800 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500" />
               <span class="ms-3 text-sm font-medium text-theme-muted">{{ $t('flash.esp32.install_inkhud') }}</span>
             </label>
           </div>
@@ -159,7 +159,7 @@
       <button
         v-if="showFlashButton"
         type="button"
-        class="w-full text-gray-900 bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-800 shadow-lg shadow-green-800/50 font-medium rounded-lg text-sm px-5 py-3 text-center transition-all"
+        class="w-full text-gray-900 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-orange-800 shadow-lg shadow-orange-800/50 font-medium rounded-lg text-sm px-5 py-3 text-center transition-all"
         @click="flash"
       >
         {{ firmwareStore.$state.shouldCleanInstall ? $t('flash.esp32.erase_and_install') : $t('flash.esp32.update') }}
@@ -181,7 +181,7 @@
         </div>
         <div class="w-full rounded-full h-2.5 progress-track">
           <div
-            class="bg-gradient-to-r from-green-400 to-green-600 h-2.5 rounded-full transition-all duration-300"
+            class="bg-gradient-to-r from-orange-400 to-orange-600 h-2.5 rounded-full transition-all duration-300"
             :style="{ width: firmwareStore.percentDone }"
           />
         </div>
@@ -443,17 +443,17 @@ const updateEsp32 = async () => {
   justify-content: center;
   padding: 0.75rem;
   border-radius: 1rem;
-  background: linear-gradient(145deg, rgba(103, 234, 148, 0.08), rgba(103, 234, 148, 0.02));
-  border: 1px solid rgba(103, 234, 148, 0.2);
+  background: linear-gradient(145deg, rgba(251, 146, 60, 0.08), rgba(251, 146, 60, 0.02));
+  border: 1px solid rgba(251, 146, 60, 0.2);
   animation: container-glow 2s ease-in-out infinite;
 }
 
 @keyframes container-glow {
   0%, 100% { 
-    box-shadow: 0 0 20px rgba(103, 234, 148, 0.15);
+    box-shadow: 0 0 20px rgba(251, 146, 60, 0.15);
   }
   50% { 
-    box-shadow: 0 0 35px rgba(103, 234, 148, 0.25);
+    box-shadow: 0 0 35px rgba(251, 146, 60, 0.25);
   }
 }
 
@@ -462,20 +462,20 @@ const updateEsp32 = async () => {
   height: 80px;
   object-fit: contain;
   border-radius: 1rem;
-  border: 1px solid rgba(103, 234, 148, 0.3);
+  border: 1px solid rgba(251, 146, 60, 0.3);
   padding: 0.5rem;
-  background: rgba(103, 234, 148, 0.05);
+  background: rgba(251, 146, 60, 0.05);
 }
 
 .chirpy-success {
-  filter: drop-shadow(0 0 15px rgba(103, 234, 148, 0.6));
+  filter: drop-shadow(0 0 15px rgba(251, 146, 60, 0.6));
 }
 
 .chirpy-status-text {
   margin-top: 0.75rem;
   font-size: 0.875rem;
   font-weight: 500;
-  color: #67EA94;
+  color: #FB923C;
   text-align: center;
   animation: text-pulse 1.5s ease-in-out infinite;
 }

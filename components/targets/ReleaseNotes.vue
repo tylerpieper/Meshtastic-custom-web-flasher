@@ -178,7 +178,7 @@ watch(
 .release-notes-box :deep(li) { margin: 0.25rem 0; }
 
 .release-notes-box :deep(a) {
-  color: #67ea94;
+  color: var(--accent, #fb923c);
   text-decoration: underline;
 }
 
@@ -205,7 +205,7 @@ watch(
 
 /* Only real `> ...` blockquotes in the source get the accent bar. */
 .release-notes-box :deep(blockquote) {
-  border-left: 4px solid #67ea94;
+  border-left: 4px solid var(--accent, #fb923c);
   padding: 0.5rem 1rem;
   margin: 1rem 0;
 }

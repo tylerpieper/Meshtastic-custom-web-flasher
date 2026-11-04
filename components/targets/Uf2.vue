@@ -22,7 +22,7 @@
           </div>
           <button
             type="button"
-            class="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-900 bg-meshtastic rounded-lg hover:bg-green-300 focus:ring-4 focus:ring-green-800 transition-colors"
+            class="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-900 bg-meshtastic rounded-lg hover:bg-orange-300 focus:ring-4 focus:ring-orange-800 transition-colors"
             @click="() => deviceStore.enterDfuMode($t)"
           >
             <FolderDown class="w-4 h-4" />
@@ -81,7 +81,7 @@
               type="checkbox"
               class="sr-only peer"
             >
-            <div class="w-11 h-6 bg-gray-400 dark:bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-800 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600" />
+            <div class="w-11 h-6 bg-gray-400 dark:bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-800 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500" />
             <span class="ms-3 text-sm font-medium text-theme-muted">{{ $t('flash.uf2.install_inkhud') }}</span>
           </label>
         </div>
@@ -112,7 +112,7 @@
             >
               <a
                 :href="getDownloadUf2Url(variant)"
-                class="w-full text-gray-900 bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-800 shadow-lg shadow-green-800/50 font-medium rounded-lg text-sm px-5 py-3 text-center transition-all"
+                class="w-full text-gray-900 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-orange-800 shadow-lg shadow-orange-800/50 font-medium rounded-lg text-sm px-5 py-3 text-center transition-all"
                 @click="trackUf2Download(variant)"
               >
                 {{ formatVariantLabel(variant) }} &ndash; {{ $t('flash.uf2.download_uf2') }}
@@ -120,7 +120,7 @@
               <a
                 v-if="getDownloadOtaZipUrl(variant)"
                 :href="getDownloadOtaZipUrl(variant)"
-                class="w-full text-meshtastic border border-meshtastic hover:bg-meshtastic hover:text-gray-900 focus:ring-4 focus:outline-none focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-3 text-center transition-all"
+                class="w-full text-meshtastic border border-meshtastic hover:bg-meshtastic hover:text-gray-900 focus:ring-4 focus:outline-none focus:ring-orange-800 font-medium rounded-lg text-sm px-5 py-3 text-center transition-all"
                 @click="trackUf2Download(variant)"
               >
                 {{ formatVariantLabel(variant) }} &ndash; {{ $t('flash.uf2.download_ota_zip') }}
@@ -129,7 +129,7 @@
             <button
               v-else
               type="button"
-              class="w-full text-gray-900 bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-800 shadow-lg shadow-green-800/50 font-medium rounded-lg text-sm px-5 py-3 text-center transition-all"
+              class="w-full text-gray-900 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-orange-800 shadow-lg shadow-orange-800/50 font-medium rounded-lg text-sm px-5 py-3 text-center transition-all"
               @click="downloadUf2FileFsForTarget(variant)"
             >
               {{ formatVariantLabel(variant) }} &ndash; {{ $t('flash.uf2.download_uf2') }}
@@ -144,7 +144,7 @@
         >
           <a
             :href="getDownloadUf2Url(deviceStore.$state.selectedTarget)"
-            class="block w-full text-gray-900 bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-800 shadow-lg shadow-green-800/50 font-medium rounded-lg text-sm px-5 py-3 text-center transition-all"
+            class="block w-full text-gray-900 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-orange-800 shadow-lg shadow-orange-800/50 font-medium rounded-lg text-sm px-5 py-3 text-center transition-all"
             @click="trackUf2Download(deviceStore.$state.selectedTarget)"
           >
             {{ $t('flash.uf2.download_uf2') }}
@@ -152,7 +152,7 @@
           <a
             v-if="getDownloadOtaZipUrl(deviceStore.$state.selectedTarget)"
             :href="getDownloadOtaZipUrl(deviceStore.$state.selectedTarget)"
-            class="block w-full text-meshtastic border border-meshtastic hover:bg-meshtastic hover:text-gray-900 focus:ring-4 focus:outline-none focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-3 text-center transition-all"
+            class="block w-full text-meshtastic border border-meshtastic hover:bg-meshtastic hover:text-gray-900 focus:ring-4 focus:outline-none focus:ring-orange-800 font-medium rounded-lg text-sm px-5 py-3 text-center transition-all"
             @click="trackUf2Download(deviceStore.$state.selectedTarget)"
           >
             {{ $t('flash.uf2.download_ota_zip') }}
@@ -161,7 +161,7 @@
         <button
           v-else
           type="button"
-          class="w-full text-gray-900 bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-800 shadow-lg shadow-green-800/50 font-medium rounded-lg text-sm px-5 py-3 text-center transition-all"
+          class="w-full text-gray-900 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-orange-800 shadow-lg shadow-orange-800/50 font-medium rounded-lg text-sm px-5 py-3 text-center transition-all"
           @click="downloadUf2FileFsForTarget(deviceStore.$state.selectedTarget)"
         >
           {{ $t('flash.uf2.download_uf2') }}

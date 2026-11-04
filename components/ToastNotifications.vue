@@ -130,12 +130,12 @@ function reloadPage() {
 
 /* Custom focus ring for meshtastic theme */
 .focus\:ring-meshtastic:focus {
-  --tw-ring-color: #67EA94;
+  --tw-ring-color: #FB923C;
 }
 
 /* Meshtastic text color */
 .text-meshtastic {
-  color: #67EA94;
+  color: #FB923C;
 }
 
 /* Toast container positioning */

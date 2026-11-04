@@ -209,8 +209,8 @@ const saveToFile = () => {
 .loader {
   width: 50px;
   height: 50px;
-  border: 4px solid rgba(103, 234, 148, 0.2);
-  border-top-color: #67EA94;
+  border: 4px solid rgba(251, 146, 60, 0.2);
+  border-top-color: #FB923C;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }

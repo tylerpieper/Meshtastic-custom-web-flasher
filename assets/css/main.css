@@ -11,8 +11,8 @@
   --bg-velvet: #0b0f1a;
   --bg-ink: #0f1726;
   --bg-grid: rgba(255, 255, 255, 0.03);
-  --bg-glow-green: rgba(103, 234, 148, 0.08);
-  --bg-glow-blue: rgba(59, 130, 246, 0.08);
+  --bg-glow-green: rgba(251, 146, 60, 0.10);
+  --bg-glow-blue: rgba(234, 88, 12, 0.06);
   --text-default: #e5e7eb;
   --text-muted: #9ca3af;
   --text-inverse: #1f2937;
@@ -24,7 +24,7 @@
      from it would drift edition to edition and could land on its neighbour;
      and in the light theme --accent is #1A9B4A, which is 3.5:1 on the cream
      modal ground and fails the 4.5:1 a 20px/600 heading needs. */
-  --tier-supported: #67ea94;
+  --tier-supported: #fb923c;
   --tier-maker: #7dd3fc;
   --tier-community: #e8a33e;
   
@@ -36,14 +36,14 @@
   
   /* Border colors */
   --border-default: rgba(255, 255, 255, 0.1);
-  --border-hover: rgba(103, 234, 148, 0.3);
-  --border-accent: rgba(103, 234, 148, 0.15);
+  --border-hover: rgba(251, 146, 60, 0.35);
+  --border-accent: rgba(251, 146, 60, 0.18);
   
   /* Accent/brand colors */
-  --accent: #67ea94;
-  --accent-dark: #22C55E;
-  --accent-glow: rgba(103, 234, 148, 0.3);
-  --accent-subtle: rgba(103, 234, 148, 0.5);
+  --accent: #fb923c;
+  --accent-dark: #f97316;
+  --accent-glow: rgba(251, 146, 60, 0.3);
+  --accent-subtle: rgba(251, 146, 60, 0.5);
   /* Legible text on a solid --accent fill (buttons, badges). Overridden per
      event theme by applyEventTheme() to stay contrast-safe on any accent. */
   --on-accent: #000000;
@@ -57,9 +57,9 @@
   --btn-icon-border-hover: rgba(255, 255, 255, 0.2);
   
   /* Tag colors */
-  --tag-active-bg: rgba(103, 234, 148, 0.2);
-  --tag-active-border: #67ea94;
-  --tag-active-text: #67ea94;
+  --tag-active-bg: rgba(251, 146, 60, 0.2);
+  --tag-active-border: #fb923c;
+  --tag-active-text: #fb923c;
   --tag-inactive-bg: rgba(39, 39, 42, 0.5);
   --tag-inactive-border: rgb(63, 63, 70);
   --tag-inactive-text: rgb(161, 161, 170);
@@ -71,8 +71,8 @@
   --device-card-bg: rgba(39, 39, 42, 0.4);
   --device-card-bg-hover: rgba(39, 39, 42, 0.6);
   --device-card-border: rgba(63, 63, 70, 0.5);
-  --device-card-border-hover: rgba(103, 234, 148, 0.4);
-  --device-card-shadow-hover: 0 15px 30px rgba(0, 0, 0, 0.3), 0 0 20px rgba(103, 234, 148, 0.1);
+  --device-card-border-hover: rgba(251, 146, 60, 0.45);
+  --device-card-shadow-hover: 0 15px 30px rgba(0, 0, 0, 0.3), 0 0 20px rgba(251, 146, 60, 0.12);
   
   /* Modal colors */
   --modal-backdrop: rgba(0, 0, 0, 0.3);
@@ -100,14 +100,14 @@
   --bg-velvet: #e8e7e3;
   --bg-ink: #e3e2de;
   --bg-grid: rgba(0, 0, 0, 0.02);
-  --bg-glow-green: rgba(103, 234, 148, 0.12);
-  --bg-glow-blue: rgba(59, 130, 246, 0.02);
+  --bg-glow-green: rgba(249, 115, 22, 0.12);
+  --bg-glow-blue: rgba(234, 88, 12, 0.04);
   --text-default: #1a1a1a;
   --text-muted: #4a4a4a;
   --text-inverse: #ffffff;
 
   /* Darkened for the cream ground: the dark-theme values sit at 1.7:1 here. */
-  --tier-supported: #137136;
+  --tier-supported: #c2410c;
   --tier-maker: #075985;
   --tier-community: #a16207;
   
@@ -119,14 +119,14 @@
   
   /* Border colors - warm gray tones */
   --border-default: rgba(0, 0, 0, 0.08);
-  --border-hover: rgba(103, 234, 148, 0.5);
-  --border-accent: rgba(103, 234, 148, 0.3);
+  --border-hover: rgba(249, 115, 22, 0.5);
+  --border-accent: rgba(249, 115, 22, 0.3);
   
-  /* Accent/brand colors - darker green for better contrast on light bg */
-  --accent: #1A9B4A;
-  --accent-dark: #158040;
-  --accent-glow: rgba(26, 155, 74, 0.2);
-  --accent-subtle: rgba(26, 155, 74, 0.35);
+  /* Accent/brand colors - darker orange for better contrast on light bg */
+  --accent: #EA580C;
+  --accent-dark: #C2410C;
+  --accent-glow: rgba(234, 88, 12, 0.2);
+  --accent-subtle: rgba(234, 88, 12, 0.35);
   
   /* Button colors - warmer grays */
   --btn-icon-bg: rgba(0, 0, 0, 0.03);
@@ -137,11 +137,9 @@
   --btn-icon-border-hover: rgba(0, 0, 0, 0.15);
   
   /* Tag colors */
-  --tag-active-bg: rgba(103, 234, 148, 0.18);
-  --tag-active-border: #22c55e;
-  /* Not --accent: #1A9B4A on the tinted pill is 3.2:1, and a 12px/500 label
-     needs 4.5:1. meshtastic-700 gets it to 5.4:1. */
-  --tag-active-text: #137136;
+  --tag-active-bg: rgba(251, 146, 60, 0.18);
+  --tag-active-border: #f97316;
+  --tag-active-text: #c2410c;
   --tag-inactive-bg: rgba(255, 253, 250, 0.9);
   --tag-inactive-border: rgba(0, 0, 0, 0.1);
   --tag-inactive-text: #4a4a4a;
@@ -153,8 +151,8 @@
   --device-card-bg: rgba(255, 253, 250, 1);
   --device-card-bg-hover: rgba(255, 255, 255, 1);
   --device-card-border: rgba(0, 0, 0, 0.06);
-  --device-card-border-hover: rgba(103, 234, 148, 0.5);
-  --device-card-shadow-hover: 0 10px 40px rgba(0, 0, 0, 0.08), 0 0 20px rgba(103, 234, 148, 0.12);
+  --device-card-border-hover: rgba(249, 115, 22, 0.5);
+  --device-card-shadow-hover: 0 10px 40px rgba(0, 0, 0, 0.08), 0 0 20px rgba(249, 115, 22, 0.12);
   
   /* Modal colors - warm cream */
   --modal-backdrop: rgba(0, 0, 0, 0.25);
@@ -247,32 +245,32 @@
     color: var(--accent);
   }
   
-  /* Card icon - darker green in light mode for visibility */
+  /* Card icon - darker orange in light mode for visibility */
   .card-icon {
-    color: #67EA94; /* meshtastic default */
+    color: #FB923C; /* meshtastic default */
   }
   :root[data-theme="light"] .card-icon {
-    color: #1A9B4A; /* meshtastic-600 for better contrast */
+    color: #EA580C; /* meshtastic-600 for better contrast */
   }
   
   /* Step badge text - darker in light mode */
   .step-number {
-    color: #67EA94; /* meshtastic default */
+    color: #FB923C; /* meshtastic default */
     font-weight: 700;
     font-size: 0.875rem;
   }
   :root[data-theme="light"] .step-number {
-    color: #1A9B4A; /* meshtastic-600 */
+    color: #EA580C; /* meshtastic-600 */
   }
   
   /* Step badge circle - darker border in light mode */
   .step-badge-circle {
-    background: rgba(103, 234, 148, 0.2);
-    border: 1px solid rgba(103, 234, 148, 0.5);
+    background: rgba(251, 146, 60, 0.2);
+    border: 1px solid rgba(251, 146, 60, 0.5);
   }
   :root[data-theme="light"] .step-badge-circle {
-    background: rgba(26, 155, 74, 0.15);
-    border: 1px solid rgba(26, 155, 74, 0.4);
+    background: rgba(234, 88, 12, 0.15);
+    border: 1px solid rgba(234, 88, 12, 0.4);
   }
   
   /* Theme-aware utility classes to replace inline styles */
@@ -530,13 +528,13 @@
     text-align: center;
   }
   .tag-pill-active .tag-pill-count {
-    background: rgba(103, 234, 148, 0.1);
+    background: rgba(251, 146, 60, 0.15);
   }
   :root[data-theme="light"] .tag-pill-count {
     background: rgba(0, 0, 0, 0.07);
   }
   :root[data-theme="light"] .tag-pill-active .tag-pill-count {
-    background: rgba(19, 113, 54, 0.1);
+    background: rgba(194, 65, 12, 0.12);
   }
 
   /* A filter pill is a control: give it the same lift .btn-primary has, so the
@@ -666,8 +664,8 @@
 
   /* Light mode: darker icon background for better visibility */
   :root[data-theme="light"] .flash-header-icon {
-    background: rgba(26, 155, 74, 0.15);
-    border-color: rgba(26, 155, 74, 0.4);
+    background: rgba(234, 88, 12, 0.15);
+    border-color: rgba(234, 88, 12, 0.4);
   }
 
   /* Theme-aware warning/yellow text */
@@ -679,22 +677,22 @@
     color: rgb(161, 98, 7); /* amber-700 for better contrast on light bg */
   }
   
-  /* Theme-aware meshtastic green text - dark in light mode */
+  /* Theme-aware meshtastic orange text - dark in light mode */
   .text-meshtastic-dark {
-    color: #1A9B4A;
+    color: #EA580C;
   }
   
   :root[data-theme="dark"] .text-meshtastic-dark {
-    color: #67EA94;
+    color: #FB923C;
   }
   
   /* Theme-aware hover text for dropdown items */
   .hover\:text-meshtastic-dark:hover {
-    color: #1A9B4A;
+    color: #EA580C;
   }
   
   :root[data-theme="dark"] .hover\:text-meshtastic-dark:hover {
-    color: #67EA94;
+    color: #FB923C;
   }
 
   /* Device card product link - accent hover, theme-aware */
@@ -756,8 +754,8 @@
   }
   
   :root[data-theme="light"] .serial-action-btn:hover {
-    color: #1A9B4A;
-    background: rgba(26, 155, 74, 0.1);
+    color: #EA580C;
+    background: rgba(234, 88, 12, 0.1);
   }
   
   .serial-disconnect-btn {
