@@ -26,6 +26,7 @@ export default defineNuxtConfig({
   app: {
     baseURL: process.env.NUXT_APP_BASE_URL || '/',
     head: {
+      title: "TAPEDECK'S WEB FLASHER",
       script: process.env.COOKIEYES_CLIENT_ID
         ? [
             {
